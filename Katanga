@@ -1,0 +1,413 @@
+-- Carga la librería de UI de Orion
+local gameId = game.PlaceId
+if (gameId == 17316900493) then
+
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+
+-- Crea una ventana de UI
+local Window = OrionLib:MakeWindow({
+    Name = "Katanga Hub | Anime Simulator |",
+    IntroText = "Katanga Hub",
+    SaveConfig = true,
+    ConfigFolder = "Test"
+})
+
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local autoTPEnabled = false
+local selectedOption = nil
+local selectedBanditToAppear = nil
+local selectedPlayerName = nil
+local autoSkillEnabled = false
+local autoTPToBanditSpawnEnabled = false
+local autoSkillEnabled = false
+
+local autoTPToBanditEnabled = false
+local selectedBanditName = nil
+
+local FarmTab = Window:MakeTab({
+    Name = "Farm",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local SkillsTab = Window:MakeTab({
+    Name = "Skills",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Función para activar habilidades
+local function ActivateSkill(skillName)
+    local remoteName = "112a111b119c101d114e83f101g114h118i105j99k101l194m177n52o99p48q52r99s97t98u" -- Nombre del RemoteEvent
+
+    local args = {}
+    if skillName == "rapidBarrage" then
+        args = {
+            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
+            [2] = "rapidBarrage",
+            [3] = CFrame.new(Vector3.new(14.896395683288574, 292.3204040527344, 24146.671875), Vector3.new(-0.0006190685671754181, -0.012105642817914486, -0.9999264478683472)),
+            [4] = CFrame.new(Vector3.new(-359.6319580078125, 76.353759765625, 24346.80859375), Vector3.new(0.014800121076405048, -0.0031164358370006084, -0.999885618686676))
+        }
+    elseif skillName == "purgatoryOnigiri" then
+        args = {
+            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
+            [2] = "purgatoryOnigiri",
+            [3] = CFrame.new(Vector3.new(33.936641693115234, 291.49908447265625, 24172.98828125), Vector3.new(-0.05860769748687744, 7.105777655169732e-08, 0.9982811212539673)),
+            [4] = CFrame.new(Vector3.new(-269.5148620605469, -25.853759765625, 24360.96484375), Vector3.new(0.6091830730438232, 0.6674013137817383, -0.42833566665649414))
+        }
+    elseif skillName == "getsugaTensho" then
+        args = {
+            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
+            [2] = "getsugaTensho",
+            [3] = CFrame.new(Vector3.new(-43.38063430786133, 292.3223876953125, 24220.939453125), Vector3.new(-0.8417871594429016, -9.184653926297415e-09, 0.5398095846176147)),
+            [4] = CFrame.new(Vector3.new(-409.1031494140625, 9.272247314453125, 24104.076171875), Vector3.new(0.7758917808532715, 0.596949577331543, 0.2040664404630661))
+        }
+    elseif skillName == "rapidSwordSlash" then
+        args = {
+            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
+            [2] = "rapidSwordSlash",
+            [3] = CFrame.new(Vector3.new(-43.4813117980957, 292.3223876953125, 24221.001953125), Vector3.new(-0.8111982345581055, -5.1718590299287825e-08, 0.5847712755203247)),
+            [4] = CFrame.new(Vector3.new(-433.03070068359375, 48.73541259765625, 24090.533203125), Vector3.new(0.8234613537788391, 0.518113911151886, 0.23123441636562347))
+        }
+    elseif skillName == "fireballJutsu" then
+        args = {
+            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
+            [2] = "fireballJutsu",
+            [3] = CFrame.new(Vector3.new(-43.487178802490234, 292.3223876953125, 24221.03125), Vector3.new(-0.8243278861045837, 5.249929557749056e-08, 0.5661126375198364)),
+            [4] = CFrame.new(Vector3.new(-440.73590087890625, 71.43954467773438, 24071.109375), Vector3.new(0.8387941718101501, 0.4727412462234497, 0.27007418870925903))
+        }
+    elseif skillName == "detroitSmash" then
+        args = {
+            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
+            [2] = "detroitSmash",
+            [3] = CFrame.new(Vector3.new(-43.5300178527832, 292.3223876953125, 24221.013671875), Vector3.new(-0.9315144419670105, 1.0241510040032153e-07, -0.3637043237686157)),
+            [4] = CFrame.new(Vector3.new(-430.37298583984375, 73.92436218261719, 24038.568359375), Vector3.new(0.8179277181625366, 0.4677305221557617, 0.33499613404273987))
+        }
+    end
+
+    -- Llama al RemoteEvent para activar la habilidad
+    local remoteEvent = ReplicatedStorage.Remotes:FindFirstChild(remoteName)
+    if remoteEvent then
+        remoteEvent:FireServer(unpack(args))
+    else
+        print("RemoteEvent no encontrado")
+    end
+end
+
+-- Agrega un toggle para cada habilidad en la pestaña Skills
+SkillsTab:AddToggle({
+    Name = "Rapid Barrage",
+    Default = false,
+    Callback = function(state)
+        while state do
+            ActivateSkill("rapidBarrage")
+            wait(2) -- Tiempo de espera entre ejecuciones
+        end
+    end
+})
+
+SkillsTab:AddToggle({
+    Name = "Purgatory Onigiri",
+    Default = false,
+    Callback = function(state)
+        while state do
+            ActivateSkill("purgatoryOnigiri")
+            wait(6) -- Tiempo de espera entre ejecuciones
+        end
+    end
+})
+
+SkillsTab:AddToggle({
+    Name = "Getsuga Tensho",
+    Default = false,
+    Callback = function(state)
+        while state do
+            ActivateSkill("getsugaTensho")
+            wait(3) -- Tiempo de espera entre ejecuciones
+        end
+    end
+})
+
+SkillsTab:AddToggle({
+    Name = "Rapid Sword Slash",
+    Default = false,
+    Callback = function(state)
+        while state do
+            ActivateSkill("rapidSwordSlash")
+            wait(5) -- Tiempo de espera entre ejecuciones
+        end
+    end
+})
+
+SkillsTab:AddToggle({
+    Name = "Fireball Jutsu",
+    Default = false,
+    Callback = function(state)
+        while state do
+            ActivateSkill("fireballJutsu")
+            wait(3) -- Tiempo de espera entre ejecuciones
+        end
+    end
+})
+
+SkillsTab:AddToggle({
+    Name = "Detroit Smash",
+    Default = false,
+    Callback = function(state)
+        while state do
+            ActivateSkill("detroitSmash")
+            wait(4) -- Tiempo de espera entre ejecuciones
+        end
+    end
+})
+
+-- Función para teletransportarse al Bandit seleccionado
+local function TeleportToBandit()
+    if selectedBanditName then
+        local characters = Workspace.SharedObjects.Characters:GetChildren()
+        for _, character in ipairs(characters) do
+            if character:IsA("Model") and character:GetAttribute("BanditName") == selectedBanditName then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart then
+                    Players.LocalPlayer.Character.HumanoidRootPart.CFrame = humanoidRootPart.CFrame
+                    print("Teletransportado a " .. selectedBanditName)
+                    return
+                else
+                    print("No se encontró HumanoidRootPart en " .. character.Name)
+                end
+            end
+        end
+        print("No se encontró el Bandit con el nombre: " .. selectedBanditName)
+    end
+end
+
+-- Dropdown para seleccionar Bandit Name
+FarmTab:AddDropdown({
+    Name = "Select Bandit Name",
+    Options = {"pirate1", "pirate2", "ninja", "bodybuilder"},
+    Default = 1,
+    Callback = function(option)
+        selectedBanditName = option
+        print("Selected Bandit Name: " .. selectedBanditName)
+    end
+})
+
+-- Toggle para activar/desactivar el teletransporte automático a Bandit
+FarmTab:AddToggle({
+    Name = "Auto TP to Bandit",
+    Default = false,
+    Callback = function(state)
+        autoTPToBanditEnabled = state
+        while autoTPToBanditEnabled do
+            TeleportToBandit()
+            wait(0.5) -- Espera 1 segundo antes de repetir el teletransporte
+        end
+    end
+})
+
+-- Función para obtener los nombres de los jugadores
+local function GetPlayerNames()
+    local players = game:GetService("Players"):GetPlayers()
+    local names = {}
+    for _, player in ipairs(players) do
+        table.insert(names, player.Name)
+    end
+    return names
+end
+
+-- Función para obtener los nombres de los modelos en TrainingAreas
+local function GetTrainingAreasModels()
+    local models = {}
+    local trainingAreas = game:GetService("Workspace").SharedObjects.TrainingAreas
+
+    for _, obj in ipairs(trainingAreas:GetChildren()) do
+        if obj:IsA("Model") then
+            table.insert(models, obj.Name)
+        end
+    end
+
+    return models
+end
+
+-- Crea una pestaña para las funciones de teletransporte
+local TpTab = Window:MakeTab({
+    Name = "Tp Areas",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Agrega el dropdown para seleccionar modelos de TrainingAreas
+TpTab:AddDropdown({
+    Name = "Select Training Area",
+    Options = GetTrainingAreasModels(),
+    Default = 1,
+    Callback = function(modelName)
+        selectedModelName = modelName
+        print("Selected Model: " .. selectedModelName)
+    end
+})
+
+-- Agrega un botón para teletransportarse al modelo seleccionado
+TpTab:AddButton({
+    Name = "Teleport to Selected Area",
+    Callback = function()
+        if selectedModelName then
+            local trainingAreas = game:GetService("Workspace").SharedObjects.TrainingAreas
+            local model = trainingAreas:FindFirstChild(selectedModelName)
+            if model and model:FindFirstChild("BoundingBox") then
+                -- Teletransporta al jugador a la posición del BoundingBox
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = model.BoundingBox.CFrame
+            else
+                warn("Selected model does not exist or does not have a BoundingBox part.")
+            end
+        else
+            warn("No model selected.")
+        end
+    end
+})
+
+local killplayerTab = Window:MakeTab({
+    Name = "Tp",
+    Icon = "rbxassetid://4483345998"
+})
+
+-- Función para teletransportarse al jugador seleccionado
+local function TeleportToPlayer()
+    if selectedPlayerName then
+        local player = Players:FindFirstChild(selectedPlayerName)
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            Players.LocalPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
+            print("Teletransportado a " .. selectedPlayerName)
+        else
+            print("No se encontró el jugador o su HumanoidRootPart.")
+        end
+    else
+        print("No se seleccionó ningún jugador.")
+    end
+end
+
+-- Agrega el dropdown para seleccionar jugadores
+killplayerTab:AddDropdown({
+    Name = "Select Player",
+    Options = GetPlayerNames(),
+    Default = 1,
+    Callback = function(playerName)
+        selectedPlayerName = playerName
+    end
+})
+
+-- Agrega el toggle para activar/desactivar el teletransporte automático
+killplayerTab:AddToggle({
+    Name = "Auto Teleport",
+    Default = false,
+    Callback = function(state)
+        autoTPEnabled = state
+        while autoTPEnabled do
+            TeleportToPlayer()
+            wait(1) -- Espera 1 segundo antes de repetir el teletransporte
+        end
+    end
+})
+
+
+
+-- Función para buscar y teletransportarse al modelo según el BanditName
+local function TeleportToBandit()
+    if selectedOption then
+        local characters = Workspace.SharedObjects.Characters:GetChildren()
+        for _, character in ipairs(characters) do
+            if character:IsA("Model") and character:GetAttribute("BanditName") == selectedOption then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart then
+                    Players.LocalPlayer.Character.HumanoidRootPart.CFrame = humanoidRootPart.CFrame
+                    print("Teletransportado a " .. selectedOption)
+                    return
+                else
+                    print("No se encontró HumanoidRootPart en " .. character.Name)
+                end
+            else
+                print("No se encontró BanditName igual a " .. selectedOption)
+            end
+        end
+        -- Si no se encuentra en Characters, buscar en BanditSpawns
+        local banditSpawns = Workspace.ServerObjects.BanditSpawns:GetChildren()
+        for _, spawn in ipairs(banditSpawns) do
+            if spawn:IsA("Model") and spawn:FindFirstChild("BanditName") and spawn.BanditName.Value == selectedOption then
+                local spawnPart = spawn:FindFirstChildWhichIsA("Part")
+                if spawnPart then
+                    Players.LocalPlayer.Character.HumanoidRootPart.CFrame = spawnPart.CFrame
+                    print("Teletransportado a BanditSpawn de " .. selectedOption)
+                    return
+                else
+                    print("No se encontró Part en " .. spawn.Name)
+                end
+            else
+                print("No se encontró BanditName igual a " .. selectedOption .. " en BanditSpawns")
+            end
+        end
+        print("No se encontró el bandit: " .. selectedOption)
+    end
+end
+
+-- Función para teletransportarse al Part de BanditSpawns según el nombre del dropdown
+local function TeleportToBanditSpawn()
+    if selectedBanditToAppear then
+        local banditSpawns = Workspace.ServerObjects.BanditSpawns:GetChildren()
+        for _, spawn in ipairs(banditSpawns) do
+            if spawn:IsA("Part") and spawn.Name == selectedBanditToAppear then
+                Players.LocalPlayer.Character.HumanoidRootPart.CFrame = spawn.CFrame
+                print("Teletransportado a BanditSpawn con nombre: " .. selectedBanditToAppear)
+                return
+            end
+        end
+        print("No se encontró el BanditSpawn con nombre: " .. selectedBanditToAppear)
+    end
+end
+
+-- Obtener los nombres de BanditSpawns
+local function GetBanditSpawnNames()
+    local banditSpawns = Workspace.ServerObjects.BanditSpawns:GetChildren()
+    local names = {}
+    for _, spawn in ipairs(banditSpawns) do
+        if spawn:IsA("Part") then
+            table.insert(names, spawn.Name)
+        end
+    end
+    return names
+end
+
+-- Dropdown para seleccionar el nombre del BanditSpawn
+FarmTab:AddDropdown({
+    Name = "Select Bandit Spawn",
+    Options = GetBanditSpawnNames(),
+    Default = 1,
+    Callback = function(partName)
+        selectedBanditToAppear = partName
+    end
+})
+
+-- Agrega el botón para teletransportarse al BanditSpawn seleccionado
+FarmTab:AddButton({
+    Name = "Teleport to Bandit Spawn",
+    Callback = function()
+        TeleportToBanditSpawn()
+    end
+})
+
+-- Agrega el toggle para activar/desactivar el auto teletransporte a jugadores
+killplayerTab:AddToggle({
+    Name = "Auto Teleport to Player",
+    Default = false,
+    Callback = function(state)
+        autoTPEnabled = state
+        while autoTPEnabled do
+            TeleportToPlayer()
+            wait(1) -- Espera 1 segundo antes de repetir el teletransporte
+        end
+    end
+})
+end
+OrionLib:Init()
