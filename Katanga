@@ -1,6 +1,3 @@
--- Carga la librería de UI de Orion
-local gameId = game.PlaceId
-if (gameId == 17316900493) then
 
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
@@ -409,5 +406,5 @@ killplayerTab:AddToggle({
         end
     end
 })
-end
+
 OrionLib:Init()
