@@ -1,4 +1,4 @@
-
+-- Carga la librería de UI de Orion
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
 -- Crea una ventana de UI
@@ -7,6 +7,36 @@ local Window = OrionLib:MakeWindow({
     IntroText = "Katanga Hub",
     SaveConfig = true,
     ConfigFolder = "Test"
+})
+
+local FarmTab = Window:MakeTab({
+    Name = "Farm",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local AurasTab = Window:MakeTab({
+    Name = "AutoAura",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local BanditsTab = Window:MakeTab({
+    Name = "Bandits",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local TpTab = Window:MakeTab({
+    Name = "Tp Areas",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local killplayerTab = Window:MakeTab({
+    Name = "Tp",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
 })
 
 local Workspace = game:GetService("Workspace")
@@ -24,186 +54,26 @@ local autoSkillEnabled = false
 local autoTPToBanditEnabled = false
 local selectedBanditName = nil
 
-local FarmTab = Window:MakeTab({
-    Name = "Farm",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-local SkillsTab = Window:MakeTab({
-    Name = "Skills",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
--- Función para activar habilidades
-local function ActivateSkill(skillName)
-    local remoteName = "112a111b119c101d114e83f101g114h118i105j99k101l194m177n52o99p48q52r99s97t98u" -- Nombre del RemoteEvent
-
-    local args = {}
-    if skillName == "rapidBarrage" then
-        args = {
-            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
-            [2] = "rapidBarrage",
-            [3] = CFrame.new(Vector3.new(14.896395683288574, 292.3204040527344, 24146.671875), Vector3.new(-0.0006190685671754181, -0.012105642817914486, -0.9999264478683472)),
-            [4] = CFrame.new(Vector3.new(-359.6319580078125, 76.353759765625, 24346.80859375), Vector3.new(0.014800121076405048, -0.0031164358370006084, -0.999885618686676))
-        }
-    elseif skillName == "purgatoryOnigiri" then
-        args = {
-            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
-            [2] = "purgatoryOnigiri",
-            [3] = CFrame.new(Vector3.new(33.936641693115234, 291.49908447265625, 24172.98828125), Vector3.new(-0.05860769748687744, 7.105777655169732e-08, 0.9982811212539673)),
-            [4] = CFrame.new(Vector3.new(-269.5148620605469, -25.853759765625, 24360.96484375), Vector3.new(0.6091830730438232, 0.6674013137817383, -0.42833566665649414))
-        }
-    elseif skillName == "getsugaTensho" then
-        args = {
-            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
-            [2] = "getsugaTensho",
-            [3] = CFrame.new(Vector3.new(-43.38063430786133, 292.3223876953125, 24220.939453125), Vector3.new(-0.8417871594429016, -9.184653926297415e-09, 0.5398095846176147)),
-            [4] = CFrame.new(Vector3.new(-409.1031494140625, 9.272247314453125, 24104.076171875), Vector3.new(0.7758917808532715, 0.596949577331543, 0.2040664404630661))
-        }
-    elseif skillName == "rapidSwordSlash" then
-        args = {
-            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
-            [2] = "rapidSwordSlash",
-            [3] = CFrame.new(Vector3.new(-43.4813117980957, 292.3223876953125, 24221.001953125), Vector3.new(-0.8111982345581055, -5.1718590299287825e-08, 0.5847712755203247)),
-            [4] = CFrame.new(Vector3.new(-433.03070068359375, 48.73541259765625, 24090.533203125), Vector3.new(0.8234613537788391, 0.518113911151886, 0.23123441636562347))
-        }
-    elseif skillName == "fireballJutsu" then
-        args = {
-            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
-            [2] = "fireballJutsu",
-            [3] = CFrame.new(Vector3.new(-43.487178802490234, 292.3223876953125, 24221.03125), Vector3.new(-0.8243278861045837, 5.249929557749056e-08, 0.5661126375198364)),
-            [4] = CFrame.new(Vector3.new(-440.73590087890625, 71.43954467773438, 24071.109375), Vector3.new(0.8387941718101501, 0.4727412462234497, 0.27007418870925903))
-        }
-    elseif skillName == "detroitSmash" then
-        args = {
-            [1] = "99a104b97c114d103e101f194g177h52i99j48k52l99m97n98o",
-            [2] = "detroitSmash",
-            [3] = CFrame.new(Vector3.new(-43.5300178527832, 292.3223876953125, 24221.013671875), Vector3.new(-0.9315144419670105, 1.0241510040032153e-07, -0.3637043237686157)),
-            [4] = CFrame.new(Vector3.new(-430.37298583984375, 73.92436218261719, 24038.568359375), Vector3.new(0.8179277181625366, 0.4677305221557617, 0.33499613404273987))
-        }
-    end
-
-    -- Llama al RemoteEvent para activar la habilidad
-    local remoteEvent = ReplicatedStorage.Remotes:FindFirstChild(remoteName)
-    if remoteEvent then
-        remoteEvent:FireServer(unpack(args))
-    else
-        print("RemoteEvent no encontrado")
-    end
-end
-
--- Agrega un toggle para cada habilidad en la pestaña Skills
-SkillsTab:AddToggle({
-    Name = "Rapid Barrage",
-    Default = false,
-    Callback = function(state)
-        while state do
-            ActivateSkill("rapidBarrage")
-            wait(2) -- Tiempo de espera entre ejecuciones
-        end
-    end
-})
-
-SkillsTab:AddToggle({
-    Name = "Purgatory Onigiri",
-    Default = false,
-    Callback = function(state)
-        while state do
-            ActivateSkill("purgatoryOnigiri")
-            wait(6) -- Tiempo de espera entre ejecuciones
-        end
-    end
-})
-
-SkillsTab:AddToggle({
-    Name = "Getsuga Tensho",
-    Default = false,
-    Callback = function(state)
-        while state do
-            ActivateSkill("getsugaTensho")
-            wait(3) -- Tiempo de espera entre ejecuciones
-        end
-    end
-})
-
-SkillsTab:AddToggle({
-    Name = "Rapid Sword Slash",
-    Default = false,
-    Callback = function(state)
-        while state do
-            ActivateSkill("rapidSwordSlash")
-            wait(5) -- Tiempo de espera entre ejecuciones
-        end
-    end
-})
-
-SkillsTab:AddToggle({
-    Name = "Fireball Jutsu",
-    Default = false,
-    Callback = function(state)
-        while state do
-            ActivateSkill("fireballJutsu")
-            wait(3) -- Tiempo de espera entre ejecuciones
-        end
-    end
-})
-
-SkillsTab:AddToggle({
-    Name = "Detroit Smash",
-    Default = false,
-    Callback = function(state)
-        while state do
-            ActivateSkill("detroitSmash")
-            wait(4) -- Tiempo de espera entre ejecuciones
-        end
-    end
-})
-
--- Función para teletransportarse al Bandit seleccionado
-local function TeleportToBandit()
-    if selectedBanditName then
-        local characters = Workspace.SharedObjects.Characters:GetChildren()
-        for _, character in ipairs(characters) do
-            if character:IsA("Model") and character:GetAttribute("BanditName") == selectedBanditName then
-                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-                if humanoidRootPart then
-                    Players.LocalPlayer.Character.HumanoidRootPart.CFrame = humanoidRootPart.CFrame
-                    print("Teletransportado a " .. selectedBanditName)
-                    return
-                else
-                    print("No se encontró HumanoidRootPart en " .. character.Name)
-                end
-            end
-        end
-        print("No se encontró el Bandit con el nombre: " .. selectedBanditName)
-    end
-end
-
--- Dropdown para seleccionar Bandit Name
-FarmTab:AddDropdown({
-    Name = "Select Bandit Name",
-    Options = {"pirate1", "pirate2", "ninja", "bodybuilder"},
-    Default = 1,
-    Callback = function(option)
-        selectedBanditName = option
-        print("Selected Bandit Name: " .. selectedBanditName)
-    end
-})
-
--- Toggle para activar/desactivar el teletransporte automático a Bandit
-FarmTab:AddToggle({
-    Name = "Auto TP to Bandit",
-    Default = false,
-    Callback = function(state)
-        autoTPToBanditEnabled = state
-        while autoTPToBanditEnabled do
-            TeleportToBandit()
-            wait(0.5) -- Espera 1 segundo antes de repetir el teletransporte
-        end
-    end
-})
+local equipSwordActive = false
+local rapidBarrageActive = false
+local firePillarActive = false
+local fireFistActive = false
+local fireBallActive = false
+local purgatoryOnigiriActive = false
+local equipfruit = false
+local gurasmash = false
+local airpalm = false
+local icespike = false
+local blackhole = false
+local darkball = false
+local tsunami = false
+local equipFruitActive = false
+local autoAbilityActive = false
+local proximityCheckRunning = false
+local darkPull = false
+local vFlame = false
+local spiritbomb = false
+local Autoaura = false
 
 -- Función para obtener los nombres de los jugadores
 local function GetPlayerNames()
@@ -229,48 +99,6 @@ local function GetTrainingAreasModels()
     return models
 end
 
--- Crea una pestaña para las funciones de teletransporte
-local TpTab = Window:MakeTab({
-    Name = "Tp Areas",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
--- Agrega el dropdown para seleccionar modelos de TrainingAreas
-TpTab:AddDropdown({
-    Name = "Select Training Area",
-    Options = GetTrainingAreasModels(),
-    Default = 1,
-    Callback = function(modelName)
-        selectedModelName = modelName
-        print("Selected Model: " .. selectedModelName)
-    end
-})
-
--- Agrega un botón para teletransportarse al modelo seleccionado
-TpTab:AddButton({
-    Name = "Teleport to Selected Area",
-    Callback = function()
-        if selectedModelName then
-            local trainingAreas = game:GetService("Workspace").SharedObjects.TrainingAreas
-            local model = trainingAreas:FindFirstChild(selectedModelName)
-            if model and model:FindFirstChild("BoundingBox") then
-                -- Teletransporta al jugador a la posición del BoundingBox
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = model.BoundingBox.CFrame
-            else
-                warn("Selected model does not exist or does not have a BoundingBox part.")
-            end
-        else
-            warn("No model selected.")
-        end
-    end
-})
-
-local killplayerTab = Window:MakeTab({
-    Name = "Tp",
-    Icon = "rbxassetid://4483345998"
-})
-
 -- Función para teletransportarse al jugador seleccionado
 local function TeleportToPlayer()
     if selectedPlayerName then
@@ -285,29 +113,6 @@ local function TeleportToPlayer()
         print("No se seleccionó ningún jugador.")
     end
 end
-
--- Agrega el dropdown para seleccionar jugadores
-killplayerTab:AddDropdown({
-    Name = "Select Player",
-    Options = GetPlayerNames(),
-    Default = 1,
-    Callback = function(playerName)
-        selectedPlayerName = playerName
-    end
-})
-
--- Agrega el toggle para activar/desactivar el teletransporte automático
-killplayerTab:AddToggle({
-    Name = "Auto Teleport",
-    Default = false,
-    Callback = function(state)
-        autoTPEnabled = state
-        while autoTPEnabled do
-            TeleportToPlayer()
-            wait(1) -- Espera 1 segundo antes de repetir el teletransporte
-        end
-    end
-})
 
 
 
@@ -376,8 +181,486 @@ local function GetBanditSpawnNames()
     return names
 end
 
+
+local function checkAndEquipFruit()
+    local playerName = game.Players.LocalPlayer.Name
+    local player = game.Workspace.SharedObjects.Characters:FindFirstChild(playerName)
+    
+    if player then
+        local activeTransformation = player:GetAttribute("ActiveTransformationName")
+        
+        if not activeTransformation or activeTransformation == "" then
+            -- Si no hay transformación activa, ejecuta el código para equipar la fruta
+            local args = {
+                [1] = "101a113b117c105d112e194f177g54h50i48j54k101l99m54n",
+                [2] = "fireFire"
+            }
+            
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c110d115e102f111g114h109i97j116k105l111m110n83o101p114q118r105s99t101u194v177w54x50y48z54{" ..
+                ""):FireServer(unpack(args))                     
+        end
+    end
+end
+
+local function checkAndSelectTraining()
+    local player = game:GetService("Players").LocalPlayer
+    
+    if player then
+        local selectedTrainingStat = player:GetAttribute("SelectedTrainingStatName")
+        
+        -- Verificar el valor del atributo para determinar la acción a tomar
+        if selectedTrainingStat == "" or not selectedTrainingStat then
+            -- Si no hay un entrenamiento seleccionado, selecciona "weapon"
+            local args = {
+                [1] = "115a101b108c101d99e116f194g177h54i50j48k54l101m99n54o",
+                [2] = "weapon"
+            }
+            
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o54p50q48r54s101t99u54v"):FireServer(unpack(args))
+            
+        elseif selectedTrainingStat == "energy" or selectedTrainingStat == "strength" then
+            -- Si el entrenamiento seleccionado es "strength" o "energy", cámbialo a "weapon"
+            local args = {
+                [1] = "115a101b108c101d99e116f194g177h54i50j48k54l101m99n54o",
+                [2] = "weapon"
+            }
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o54p50q48r54s101t99u54v"):FireServer(unpack(args))
+        end
+    end
+end
+
+-- Función para teletransportarse al Bandit seleccionado
+local function TeleportToBandit()
+    if selectedBanditName then
+        local characters = Workspace.SharedObjects.Characters:GetChildren()
+        for _, character in ipairs(characters) do
+            if character:IsA("Model") and character:GetAttribute("BanditName") == selectedBanditName then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart then
+                    Players.LocalPlayer.Character.HumanoidRootPart.CFrame = humanoidRootPart.CFrame
+                    print("Teletransportado a " .. selectedBanditName)
+                    return
+                else
+                    print("No se encontró HumanoidRootPart en " .. character.Name)
+                end
+            end
+        end
+        print("No se encontró el Bandit con el nombre: " .. selectedBanditName)
+    end
+end
+
+
+local function checkAndActivateBuff()
+    local playerName = game.Players.LocalPlayer.Name
+    local player = game.Workspace.SharedObjects.Characters:FindFirstChild(playerName)
+    
+    if player then
+        local activeBuffPower = player:GetAttribute("ActiveBuffPowerName")
+        
+        if not activeBuffPower or activeBuffPower == "" then
+            -- Si no hay buff activo, ejecuta el código para activar el buff
+            local args = {
+                [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                [2] = "susanooArmor",
+                [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(-0, -0, -1)),
+                [4] = CFrame.new(Vector3.new(-2187.389892578125, -419.7529296875, 19601.9765625), Vector3.new(-0.37717315554618835, 0.33692970871925354, 0.8626810908317566))
+            }
+            
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))            
+        end
+    end
+end
+
+FarmTab:AddToggle({
+    Name = "EquipFruit, Sword and Susanoo",
+    Default = false,
+    Callback = function(value)
+        equipFruitActive = value
+        while equipFruitActive do
+            checkAndEquipFruit()
+            checkAndSelectTraining()
+            checkAndActivateBuff()  -- Llama a la función de activación de buff
+            wait(5)  -- Espera 5 segundos antes de volver a verificar
+        end
+    end
+})
+
+
+FarmTab:AddToggle({
+    Name = "Rapid Barrage",
+    Default = false,
+    Callback = function(value)
+        rapidBarrageActive = value
+        if rapidBarrageActive then
+            spawn(function()
+                while rapidBarrageActive do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "rapidBarrage",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(9.607884556310162e-15, -6.703301380639459e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2202.9228515625, -422.8894348144531, 19611.76171875), Vector3.new(0.3333132565021515, 0.6262376308441162, -0.7047897577285767))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(6)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "FirePillar",
+    Default = false,
+    Callback = function(value)
+        firePillarActive = value
+        if firePillarActive then
+            spawn(function()
+                while firePillarActive do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "firePillar",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(4.068482628295485e-15, 2.0601323313940156e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2176.224365234375, -438.6297607421875, 19616.48828125), Vector3.new(-0.5701519846916199, 0.7623313069343567, -0.30623143911361694))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))
+                    
+                    wait(9)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "Firefist",
+    Default = false,
+    Callback = function(value)
+        fireFistActive = value
+        if fireFistActive then
+            spawn(function()
+                while fireFistActive do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "fireFist",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(0.1112038865685463, 0.021295657381415367, -0.9935693740844727)),
+                        [4] = CFrame.new(Vector3.new(-2161.1123046875, -446.30767822265625, 19597.208984375), Vector3.new(0.10955100506544113, 0.022667981684207916, -0.993722677230835))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(4)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "FireBall",
+    Default = false,
+    Callback = function(value)
+        fireBallActive = value
+        if fireBallActive then
+            spawn(function()
+                while fireBallActive do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "fireballJutsu",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(7.284091170132404e-15, -4.8535333974086825e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2201.420654296875, -425.4245910644531, 19610.060546875), Vector3.new(0.2349233329296112, 0.7717719078063965, -0.590913712978363))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(15)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "Purgatory Onigiri",
+    Default = false,
+    Callback = function(value)
+        purgatoryOnigiriActive = value
+        if purgatoryOnigiriActive then
+            spawn(function()
+                while purgatoryOnigiriActive do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "purgatoryOnigiri",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(-3.10268247988589e-16, 2.0404399947437923e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2216.452880859375, -443.9134521484375, 19619.427734375), Vector3.new(0.4996311068534851, 0.7672519683837891, -0.4021109342575073))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(4)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "gurasmash",
+    Default = false,
+    Callback = function(value)
+        gurasmash = value
+        if gurasmash then
+            spawn(function()
+                while gurasmash do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "guraSmash",
+                        [3] = CFrame.new(Vector3.new(4181.42333984375, 288.6316833496094, 23574.494140625), Vector3.new(0.7085769176483154, -7.799491186233354e-08, 0.7056335806846619)),
+                        [4] = CFrame.new(Vector3.new(4384.60302734375, -103.08358764648438, 23775.76953125), Vector3.new(-0.41693776845932007, 0.8211578726768494, -0.38969555497169495))
+                  
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(5)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "airpalm",
+    Default = false,
+    Callback = function(value)
+        airpalm = value
+        if airpalm then
+            spawn(function()
+                while airpalm do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "airPalm",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(8.845702287514114e-15, -2.6858939961016404e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2188.72705078125, -425.4916076660156, 19615.859375), Vector3.new(-0.33237332105636597, 0.7240994572639465, -0.6043244004249573))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))
+                    
+                    wait(26)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "blackhole",
+    Default = false,
+    Callback = function(value)
+        blackhole = value
+        if blackhole then
+            spawn(function()
+                while blackhole do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "blackHole",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(2.5555775994467924e-15, 3.1697883429160356e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2204.087890625, -423.393798828125, 19606.232421875), Vector3.new(0.5712003111839294, 0.7809074521064758, -0.2528114318847656))
+                    
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(5)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "IceSpike",
+    Default = false,
+    Callback = function(value)
+        icespike = value
+        if icespike then
+            spawn(function()
+                while icespike do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "iceSpike",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(-6.860919015398313e-15, 4.375889872676453e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2200.9951171875, -424.5493469238281, 19611.6640625), Vector3.new(0.20580218732357025, 0.708396315574646, -0.6751444935798645))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(10)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "DarkBall",
+    Default = false,
+    Callback = function(value)
+        darkball = value
+        if darkball then
+            spawn(function()
+                while darkball do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "darkBall",
+                        [3] = CFrame.new(Vector3.new(5901.8154296875, -466.3701171875, 22019.197265625), Vector3.new(-0, -0, -1)),
+                        [4] = CFrame.new(Vector3.new(5911.4755859375, -469.3700256347656, 22023.53125), Vector3.new(-0.6976462602615356, 0.6208540201187134, 0.3575330972671509))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))
+                    
+                    wait(5)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "Tsunami",
+    Default = false,
+    Callback = function(value)
+        tsunami = value
+        if tsunami then
+            spawn(function()
+                while tsunami do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "tsunami",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(-7.183869384780328e-15, 6.10898851505226e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2202.1484375, -424.0280456542969, 19612.05859375), Vector3.new(0.2748682200908661, 0.6664816737174988, -0.6930003762245178))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(5)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "darkpull",
+    Default = false,
+    Callback = function(value)
+        darkPull = value
+        if darkPull then
+            spawn(function()
+                while darkPull do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "darkPull",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(5.516631564810113e-15, 7.563352966144521e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2186.413818359375, -427.95159912109375, 19612.599609375), Vector3.new(-0.4911215007305145, 0.8008933067321777, -0.34259235858917236))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(5)
+                end
+            end)
+        end
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "La V de la Flame",
+    Default = false,
+    Callback = function(value)
+        vFlame = value
+        if vFlame then
+            spawn(function()
+                while vFlame do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "fireEmperor",
+                        [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(6.6236752512677504e-15, 1.570060348399238e-08, -1)),
+                        [4] = CFrame.new(Vector3.new(-2181.22802734375, -434.651123046875, 19615.080078125), Vector3.new(-0.5207725763320923, 0.7898754477500916, -0.3238714933395386))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))                    
+                    wait(5)
+                end
+            end)
+        end
+    end
+})
+
+
+FarmTab:AddToggle({
+    Name = "GenkiDama",
+    Default = false,
+    Callback = function(value)
+        spiritbomb = value
+        if spiritbomb then
+            spawn(function()
+                while spiritbomb do
+                    local args = {
+                        [1] = "99a104b97c114d103e101f194g177h54i50j48k54l101m99n54o",
+                        [2] = "spiritBomb",
+                        [3] = CFrame.new(Vector3.new(-5661.6435546875, 324.0954284667969, 25351.88671875), Vector3.new(-0.99018394947052, -0, 0.13977015018463135)),
+                        [4] = CFrame.new(Vector3.new(-5673.599609375, 321.09454345703125, 25333.84765625), Vector3.new(0.8309435248374939, 0.17764611542224884, 0.5272331237792969))
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))
+                    wait(5)
+                end
+            end)
+        end
+    end
+})
+
+AurasTab:AddToggle({
+    Name = "AutoAura",
+    Default = false,
+    Callback = function(value)
+        Autoaura = value
+        if Autoaura then
+            spawn(function()
+                while Autoaura do
+                    local args = {
+                        [1] = "114a111b108c108d65e117f114g97h194i177j54k50l48m54n101o99p54q"
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("103a97b99c104d97e83f101g114h118i105j99k101l194m177n54o50p48q54r101s99t54u"):FireServer(unpack(args))
+                    wait(2)
+                end
+            end)
+        end
+    end
+})
+
+
+-- Dropdown para seleccionar Bandit Name
+BanditsTab:AddDropdown({
+    Name = "Select Bandit Name",
+    Options = {"pirate1", "pirate2", "ninja", "bodybuilder"},
+    Default = 1,
+    Callback = function(option)
+        selectedBanditName = option
+        print("Selected Bandit Name: " .. selectedBanditName)
+    end
+})
+
+-- Toggle para activar/desactivar el teletransporte automático a Bandit
+BanditsTab:AddToggle({
+    Name = "Auto TP to Bandit",
+    Default = false,
+    Callback = function(state)
+        autoTPToBanditEnabled = state
+        while autoTPToBanditEnabled do
+            TeleportToBandit()
+            wait(0.5) -- Espera 1 segundo antes de repetir el teletransporte
+        end
+    end
+})
+
 -- Dropdown para seleccionar el nombre del BanditSpawn
-FarmTab:AddDropdown({
+BanditsTab:AddDropdown({
     Name = "Select Bandit Spawn",
     Options = GetBanditSpawnNames(),
     Default = 1,
@@ -387,10 +670,65 @@ FarmTab:AddDropdown({
 })
 
 -- Agrega el botón para teletransportarse al BanditSpawn seleccionado
-FarmTab:AddButton({
+BanditsTab:AddButton({
     Name = "Teleport to Bandit Spawn",
     Callback = function()
         TeleportToBanditSpawn()
+    end
+})
+
+
+-- Agrega el dropdown para seleccionar modelos de TrainingAreas
+TpTab:AddDropdown({
+    Name = "Select Training Area",
+    Options = GetTrainingAreasModels(),
+    Default = 1,
+    Callback = function(modelName)
+        selectedModelName = modelName
+        print("Selected Model: " .. selectedModelName)
+    end
+})
+
+-- Agrega un botón para teletransportarse al modelo seleccionado
+TpTab:AddButton({
+    Name = "Teleport to Selected Area",
+    Callback = function()
+        if selectedModelName then
+            local trainingAreas = game:GetService("Workspace").SharedObjects.TrainingAreas
+            local model = trainingAreas:FindFirstChild(selectedModelName)
+            if model and model:FindFirstChild("BoundingBox") then
+                -- Teletransporta al jugador a la posición del BoundingBox
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = model.BoundingBox.CFrame
+            else
+                warn("Selected model does not exist or does not have a BoundingBox part.")
+            end
+        else
+            warn("No model selected.")
+        end
+    end
+})
+
+
+-- Agrega el dropdown para seleccionar jugadores
+killplayerTab:AddDropdown({
+    Name = "Select Player",
+    Options = GetPlayerNames(),
+    Default = 1,
+    Callback = function(playerName)
+        selectedPlayerName = playerName
+    end
+})
+
+-- Agrega el toggle para activar/desactivar el teletransporte automático
+killplayerTab:AddToggle({
+    Name = "Auto Teleport",
+    Default = false,
+    Callback = function(state)
+        autoTPEnabled = state
+        while autoTPEnabled do
+            TeleportToPlayer()
+            wait(1) -- Espera 1 segundo antes de repetir el teletransporte
+        end
     end
 })
 
@@ -406,5 +744,6 @@ killplayerTab:AddToggle({
         end
     end
 })
+
 
 OrionLib:Init()
