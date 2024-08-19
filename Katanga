@@ -192,12 +192,12 @@ local function checkAndEquipFruit()
         if not activeTransformation or activeTransformation == "" then
             -- Si no hay transformación activa, ejecuta el código para equipar la fruta
             local args = {
-                [1] = "101a113b117c105d112e194f177g102h55i48j49k101l101m53n",
+                [1] = "101a113b117c105d112e194f177g100h56i97j100k52l50m53n",
                 [2] = "fireFire"
             }
             
-            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c110d115e102f111g114h109i97j116k105l111m110n83o101p114q118r105s99t101u194v177w102x55y48z49" ..
-                ""):FireServer(unpack(args))            
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c110d115e102f111g114h109i97j116k105l111m110n83o101p114q118r105s99t101u194v177w100x56y97z10" ..
+                ""):FireServer(unpack(args))                       
         end
     end
 end
@@ -212,22 +212,20 @@ local function checkAndSelectTraining()
         if selectedTrainingStat == "" or not selectedTrainingStat then
             -- Si no hay un entrenamiento seleccionado, selecciona "weapon"
             local args = {
-                [1] = "115a101b108c101d99e116f194g177h102i55j48k49l101m101n53o",
-                [2] = "weapon"
+                [1] = "115a101b108c101d99e116f194g177h100i56j97k100l52m50n53o",
+                [2] = "energy"
             }
             
-            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o102p55q48r49s101t101u53v"):FireServer(unpack(args))
-            
-        elseif selectedTrainingStat == "energy" or selectedTrainingStat == "strength" then
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o100p56q97r100s52t50u53v"):FireServer(unpack(args))            
+        elseif selectedTrainingStat == "weapon" or selectedTrainingStat == "strength" then
             -- Si el entrenamiento seleccionado es "strength" o "energy", cámbialo a "weapon"
             local args = {
-                [1] = "115a101b108c101d99e116f194g177h102i55j48k49l101m101n53o",
-                [2] = "weapon"
+                [1] = "115a101b108c101d99e116f194g177h100i56j97k100l52m50n53o",
+                [2] = "energy"
             }
             
-            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o102p55q48r49s101t101u53v"):FireServer(unpack(args))
-            
-        end
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o100p56q97r100s52t50u53v"):FireServer(unpack(args))
+        end  
     end
 end
 
@@ -262,13 +260,13 @@ local function checkAndActivateBuff()
         if not activeBuffPower or activeBuffPower == "" then
             -- Si no hay buff activo, ejecuta el código para activar el buff
             local args = {
-                [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                 [2] = "susanooArmor",
                 [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(-0, -0, -1)),
                 [4] = CFrame.new(Vector3.new(-2187.389892578125, -419.7529296875, 19601.9765625), Vector3.new(-0.37717315554618835, 0.33692970871925354, 0.8626810908317566))
             }
             
-            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))            
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))            
         end
     end
 end
@@ -297,13 +295,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while rapidBarrageActive do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "rapidBarrage",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(9.607884556310162e-15, -6.703301380639459e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2202.9228515625, -422.8894348144531, 19611.76171875), Vector3.new(0.3333132565021515, 0.6262376308441162, -0.7047897577285767))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(6)
                 end
             end)
@@ -320,13 +318,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while firePillarActive do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "firePillar",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(4.068482628295485e-15, 2.0601323313940156e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2176.224365234375, -438.6297607421875, 19616.48828125), Vector3.new(-0.5701519846916199, 0.7623313069343567, -0.30623143911361694))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))
                     
                     wait(9)
                 end
@@ -344,13 +342,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while fireFistActive do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "fireFist",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(0.1112038865685463, 0.021295657381415367, -0.9935693740844727)),
                         [4] = CFrame.new(Vector3.new(-2161.1123046875, -446.30767822265625, 19597.208984375), Vector3.new(0.10955100506544113, 0.022667981684207916, -0.993722677230835))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(4)
                 end
             end)
@@ -367,13 +365,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while fireBallActive do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "fireballJutsu",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(7.284091170132404e-15, -4.8535333974086825e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2201.420654296875, -425.4245910644531, 19610.060546875), Vector3.new(0.2349233329296112, 0.7717719078063965, -0.590913712978363))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(15)
                 end
             end)
@@ -390,13 +388,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while purgatoryOnigiriActive do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "purgatoryOnigiri",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(-3.10268247988589e-16, 2.0404399947437923e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2216.452880859375, -443.9134521484375, 19619.427734375), Vector3.new(0.4996311068534851, 0.7672519683837891, -0.4021109342575073))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(4)
                 end
             end)
@@ -413,14 +411,14 @@ FarmTab:AddToggle({
             spawn(function()
                 while gurasmash do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "guraSmash",
                         [3] = CFrame.new(Vector3.new(4181.42333984375, 288.6316833496094, 23574.494140625), Vector3.new(0.7085769176483154, -7.799491186233354e-08, 0.7056335806846619)),
                         [4] = CFrame.new(Vector3.new(4384.60302734375, -103.08358764648438, 23775.76953125), Vector3.new(-0.41693776845932007, 0.8211578726768494, -0.38969555497169495))
                   
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(5)
                 end
             end)
@@ -438,13 +436,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while airpalm do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "airPalm",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(8.845702287514114e-15, -2.6858939961016404e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2188.72705078125, -425.4916076660156, 19615.859375), Vector3.new(-0.33237332105636597, 0.7240994572639465, -0.6043244004249573))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))
                     
                     wait(26)
                 end
@@ -462,14 +460,14 @@ FarmTab:AddToggle({
             spawn(function()
                 while blackhole do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "blackHole",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(2.5555775994467924e-15, 3.1697883429160356e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2204.087890625, -423.393798828125, 19606.232421875), Vector3.new(0.5712003111839294, 0.7809074521064758, -0.2528114318847656))
                     
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(5)
                 end
             end)
@@ -486,13 +484,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while icespike do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "iceSpike",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(-6.860919015398313e-15, 4.375889872676453e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2200.9951171875, -424.5493469238281, 19611.6640625), Vector3.new(0.20580218732357025, 0.708396315574646, -0.6751444935798645))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(10)
                 end
             end)
@@ -509,13 +507,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while darkball do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "darkBall",
                         [3] = CFrame.new(Vector3.new(5901.8154296875, -466.3701171875, 22019.197265625), Vector3.new(-0, -0, -1)),
                         [4] = CFrame.new(Vector3.new(5911.4755859375, -469.3700256347656, 22023.53125), Vector3.new(-0.6976462602615356, 0.6208540201187134, 0.3575330972671509))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))
                     
                     wait(5)
                 end
@@ -533,13 +531,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while tsunami do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "tsunami",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(-7.183869384780328e-15, 6.10898851505226e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2202.1484375, -424.0280456542969, 19612.05859375), Vector3.new(0.2748682200908661, 0.6664816737174988, -0.6930003762245178))
                     }
 
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(5)
                 end
             end)
@@ -556,13 +554,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while darkPull do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "darkPull",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(5.516631564810113e-15, 7.563352966144521e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2186.413818359375, -427.95159912109375, 19612.599609375), Vector3.new(-0.4911215007305145, 0.8008933067321777, -0.34259235858917236))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(5)
                 end
             end)
@@ -579,13 +577,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while vFlame do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "fireEmperor",
                         [3] = CFrame.new(Vector3.new(-2194.1728515625, -420.18634033203125, 19603.197265625), Vector3.new(6.6236752512677504e-15, 1.570060348399238e-08, -1)),
                         [4] = CFrame.new(Vector3.new(-2181.22802734375, -434.651123046875, 19615.080078125), Vector3.new(-0.5207725763320923, 0.7898754477500916, -0.3238714933395386))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(5)
                 end
             end)
@@ -603,13 +601,13 @@ FarmTab:AddToggle({
             spawn(function()
                 while spiritbomb do
                     local args = {
-                        [1] = "99a104b97c114d103e101f194g177h102i55j48k49l101m101n53o",
+                        [1] = "99a104b97c114d103e101f194g177h100i56j97k100l52m50n53o",
                         [2] = "spiritBomb",
                         [3] = CFrame.new(Vector3.new(-5661.6435546875, 324.0954284667969, 25351.88671875), Vector3.new(-0.99018394947052, -0, 0.13977015018463135)),
                         [4] = CFrame.new(Vector3.new(-5673.599609375, 321.09454345703125, 25333.84765625), Vector3.new(0.8309435248374939, 0.17764611542224884, 0.5272331237792969))
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("112a111b119c101d114e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))
                     wait(5)
                 end
             end)
@@ -626,10 +624,10 @@ AurasTab:AddToggle({
             spawn(function()
                 while Autoaura do
                     local args = {
-                        [1] = "114a111b108c108d65e117f114g97h194i177j102k55l48m49n101o101p53q"
+                        [1] = "114a111b108c108d65e117f114g97h194i177j100k56l97m100n52o50p53q"
                     }
                     
-                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("103a97b99c104d97e83f101g114h118i105j99k101l194m177n102o55p48q49r101s101t53u"):FireServer(unpack(args))                    
+                    game:GetService("ReplicatedStorage").Remotes:FindFirstChild("103a97b99c104d97e83f101g114h118i105j99k101l194m177n100o56p97q100r52s50t53u"):FireServer(unpack(args))                    
                     wait(2)
                 end
             end)
