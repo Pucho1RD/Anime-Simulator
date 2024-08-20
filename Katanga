@@ -213,15 +213,15 @@ local function checkAndSelectTraining()
             -- Si no hay un entrenamiento seleccionado, selecciona "weapon"
             local args = {
                 [1] = "115a101b108c101d99e116f194g177h100i56j97k100l52m50n53o",
-                [2] = "energy"
+                [2] = "weapon"
             }
             
             game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o100p56q97r100s52t50u53v"):FireServer(unpack(args))            
-        elseif selectedTrainingStat == "weapon" or selectedTrainingStat == "strength" then
+        elseif selectedTrainingStat == "energy" or selectedTrainingStat == "strength" then
             -- Si el entrenamiento seleccionado es "strength" o "energy", cámbialo a "weapon"
             local args = {
                 [1] = "115a101b108c101d99e116f194g177h100i56j97k100l52m50n53o",
-                [2] = "energy"
+                [2] = "weapon"
             }
             
             game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o100p56q97r100s52t50u53v"):FireServer(unpack(args))
