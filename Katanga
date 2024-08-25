@@ -192,12 +192,13 @@ local function checkAndEquipFruit()
         if not activeTransformation or activeTransformation == "" then
             -- Si no hay transformación activa, ejecuta el código para equipar la fruta
             local args = {
-                [1] = "115a101b108c101d99e116f194g177h99i54j100k97l48m102n100o",
+                [1] = "101a113b117c105d112e194f177g99h54i100j97k48l102m100n",
                 [2] = "fireFire"
             }
             
-            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c105d110e105f110g103h83i116j97k116l115m194n177o99p54q100r97s48t102u100v" ..
-                ""):FireServer(unpack(args))                       
+            game:GetService("ReplicatedStorage").Remotes:FindFirstChild("116a114b97c110d115e102f111g114h109i97j116k105l111m110n83o101p114q118r105s99t101u194v177w99x54y100z97" ..
+                ""):FireServer(unpack(args))
+            
         end
     end
 end
