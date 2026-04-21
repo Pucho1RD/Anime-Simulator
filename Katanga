@@ -1,28 +1,1442 @@
-local function decode(t)
-    local r = ""
-    for i = 1, #t do
-        r = r .. string.char(t[i] - 10)
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "World Fighters",
+    LoadingTitle = "Cargando...",
+    LoadingSubtitle = "by GTK",
+    ConfigurationSaving = {Enabled = false}
+})
+
+---------------------------------------------------
+-- 🟣 TAB 1: NPC TP PRO
+---------------------------------------------------
+local Tab = Window:CreateTab("AutoFarm", 4483362458)
+
+local WorldFolder = workspace.Server.Enemies.World
+
+local SelectedMap = nil
+local SelectedZone = "1"
+local SelectedNPC1 = nil
+local SelectedNPC2 = nil
+
+local TPEnabled = false
+local TPAll = false
+
+local NPCGroups = {}
+
+-- 🔥 NUEVO
+local PauseMapFarm = false
+
+---------------------------------------------------
+-- MAPAS
+---------------------------------------------------
+local function GetMaps()
+    local maps = {}
+    for _, map in pairs(WorldFolder:GetChildren()) do
+        table.insert(maps, map.Name)
     end
-    return r
+    return maps
 end
 
--- Tablas de datos (Ofuscadas con desplazamiento -10)
-local b = {114, 126, 126, 122, 125, 68, 57, 57, 124, 107, 129, 56, 113, 115, 126, 114, 131, 108, 131, 125, 111, 124, 109, 121, 124, 126, 111, 124, 130, 56, 109, 121, 123, 57}
-local p = {90, 127, 109, 114, 121, 59, 92, 78, 57, 75, 120, 115, 123, 111, 55, 80, 115, 113, 118, 130, 111, 124, 129, 57, 124, 111, 112, 129, 57, 114, 111, 107, 110, 129, 57, 119, 107, 115, 124, 57, 85, 80}
+---------------------------------------------------
+-- ZONAS
+---------------------------------------------------
+local function GetZones(mapName)
+    local zones = {}
+    local map = WorldFolder:FindFirstChild(mapName)
 
-local target = decode(b) .. decode(p)
+    if not map then return {"1"} end
 
-local success, result = pcall(function()
-    return game:HttpGet(target)
+    for _, obj in pairs(map:GetChildren()) do
+        if obj.Name == "1" or obj.Name == "2" then
+            table.insert(zones, obj.Name)
+        end
+    end
+
+    return zones
+end
+
+---------------------------------------------------
+-- NPCs
+---------------------------------------------------
+local function GetNPCs(mapName, zone)
+    NPCGroups = {}
+    local names = {}
+    local added = {}
+
+    local map = WorldFolder:FindFirstChild(mapName)
+    if not map then return {} end
+
+    local folder = map:FindFirstChild(zone)
+    if not folder then return {} end
+
+    for _, obj in pairs(folder:GetChildren()) do
+    print(obj.Name, obj.ClassName)
+
+    local hum = obj:FindFirstChildOfClass("Humanoid")
+    if hum then
+        print("Tiene vida:", hum.Health)
+             end
+         end
+    end
+
+    return names
+end
+
+---------------------------------------------------
+-- UI
+---------------------------------------------------
+local ZoneDropdown
+local NPCDropdown1
+local NPCDropdown2
+
+Tab:CreateDropdown({
+    Name = "Mapa",
+    Options = GetMaps(),
+    Callback = function(opt)
+        SelectedMap = opt[1]
+        ZoneDropdown:Refresh(GetZones(SelectedMap))
+        NPCDropdown1:Refresh({})
+        NPCDropdown2:Refresh({})
+    end
+})
+
+ZoneDropdown = Tab:CreateDropdown({
+    Name = "Zona",
+    Options = {"1"},
+    Callback = function(opt)
+        SelectedZone = opt[1]
+
+        local npcs = GetNPCs(SelectedMap, SelectedZone)
+        NPCDropdown1:Refresh(npcs)
+        NPCDropdown2:Refresh(npcs)
+    end
+})
+
+NPCDropdown1 = Tab:CreateDropdown({
+    Name = "NPC 1",
+    Options = {},
+    Callback = function(opt)
+        SelectedNPC1 = opt[1]
+    end
+})
+
+NPCDropdown2 = Tab:CreateDropdown({
+    Name = "NPC 2",
+    Options = {},
+    Callback = function(opt)
+        SelectedNPC2 = opt[1]
+    end
+})
+
+---------------------------------------------------
+-- AUTO REFRESH
+---------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(3)
+
+        if SelectedMap and SelectedZone then
+            local npcs = GetNPCs(SelectedMap, SelectedZone)
+            NPCDropdown1:Refresh(npcs)
+            NPCDropdown2:Refresh(npcs)
+        end
+    end
 end)
 
-if success and result then
-    local func, err = loadstring(result)
-    if func then
-        task.spawn(func)
-    else
-        warn("Error en loadstring: " .. tostring(err))
+---------------------------------------------------
+-- TOGGLES
+---------------------------------------------------
+Tab:CreateToggle({Name = "TP a TODOS", Callback = function(v) TPAll = v end})
+Tab:CreateToggle({Name = "TP first npc only", Callback = function(v) TPEnabled = v end})
+
+---------------------------------------------------
+-- LOOP AUTOFARM
+---------------------------------------------------
+task.spawn(function()
+    local npcIndex = 1
+    local partIndex = 1
+
+    -- 🔍 función para validar NPC vivo
+    local function IsAlive(part)
+        if not part or not part.Parent then return false end
+
+        local model = part.Parent
+        local hum = model:FindFirstChildOfClass("Humanoid")
+
+        -- ✔ si tiene humanoid → validamos vida
+        if hum then
+            return hum.Health > 0
+        end
+
+        -- ⚠️ si no tiene humanoid → lo consideramos válido (NPC fake)
+        return true
     end
-else
-    warn("Error en HttpGet: " .. tostring(result))
+
+    while true do
+        task.wait(0.6)
+
+        if PauseMapFarm then continue end
+
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then continue end
+
+        ---------------------------------------------------
+        -- SOLO 1
+        ---------------------------------------------------
+        if TPEnabled and not TPAll then
+            if SelectedNPC1 then
+                local group = NPCGroups[SelectedNPC1]
+
+                if group and #group > 0 then
+                    for _, part in ipairs(group) do
+                        if IsAlive(part) then
+                            hrp.CFrame = part.CFrame + Vector3.new(0,3,0)
+                            break
+                        end
+                    end
+                end
+            end
+        end
+
+        ---------------------------------------------------
+        -- TODOS (SMART)
+        ---------------------------------------------------
+        if TPAll then
+            local targets = {}
+            if SelectedNPC1 then table.insert(targets, SelectedNPC1) end
+            if SelectedNPC2 then table.insert(targets, SelectedNPC2) end
+
+            if #targets == 0 then continue end
+            if npcIndex > #targets then npcIndex = 1 end
+
+            local group = NPCGroups[targets[npcIndex]]
+
+            if group and #group > 0 then
+                local found = false
+
+                for i = partIndex, #group do
+                    local part = group[i]
+
+                    if IsAlive(part) then
+                        hrp.CFrame = part.CFrame + Vector3.new(0,3,0)
+                        partIndex = i + 1
+                        found = true
+                        break
+                    end
+                end
+
+                -- 🔁 si no encontró vivo → pasa al siguiente NPC
+                if not found then
+                    partIndex = 1
+                    npcIndex += 1
+                end
+            else
+                npcIndex += 1
+            end
+        end
+    end
+end)
+---------------------------------------------------
+-- 🔵 TRIAL (OMNI PRO SYSTEM)
+---------------------------------------------------
+local Trial = Window:CreateTab("Trial", 4483362459)
+
+local Omni = require(game:GetService("ReplicatedStorage"):WaitForChild("Omni"))
+
+local AutoJoin = false
+local AutoFarm = false
+local AutoClick = false
+local SelectedExit = nil
+
+-- 🔥 IMPORTANTE: nombre EXACTO del modo
+local TrialName = "Trial Easy"
+
+local TrialData = Omni.Libs.DataContainer:New({
+    Name = "GamemodeData - " .. TrialName
+})
+
+local Folder = workspace.Server.Enemies.Gamemodes["Trial Easy"]
+
+---------------------------------------------------
+-- TOGGLES
+---------------------------------------------------
+Trial:CreateToggle({Name="Auto Join Trial", Callback=function(v) AutoJoin=v end})
+Trial:CreateToggle({Name="Auto Farm Trial", Callback=function(v) AutoFarm=v end})
+Trial:CreateToggle({Name="Auto Fast Click", Callback=function(v) AutoClick=v end})
+
+---------------------------------------------------
+-- AUTO CLICK
+---------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(0.04)
+        if not AutoClick then continue end
+
+        game.ReplicatedStorage.BridgeNet.dataRemoteEvent:FireServer(unpack({
+            {{"General","Attack","Click",{},["n"]=4},"\2"}
+        }))
+    end
+end)
+
+---------------------------------------------------
+-- AUTO JOIN
+---------------------------------------------------
+task.spawn(function()
+    local lastMinute = -1
+
+    while true do
+        task.wait(1)
+        if not AutoJoin then continue end
+
+        local t = os.date("*t")
+        if t.min ~= lastMinute then
+            lastMinute = t.min
+
+            if t.min == 15 or t.min == 45 then
+                task.wait(2)
+
+                game.ReplicatedStorage.BridgeNet.dataRemoteEvent:FireServer(unpack({
+                    {{"General","Gamemodes","Join","Trial Easy",["n"]=4},"\2"}
+                }))
+            end
+        end
+    end
+end)
+
+---------------------------------------------------
+-- AUTO FARM TRIAL
+---------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(0.2)
+        if not AutoFarm then continue end
+
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then continue end
+
+        for _, v in pairs(Folder:GetChildren()) do
+            if v:IsA("BasePart") then
+                hrp.CFrame = v.CFrame + Vector3.new(0,3,0)
+                break
+            end
+        end
+    end
+end)
+
+---------------------------------------------------
+-- 🔥 DETECCIÓN REAL DE TRIAL (OMNI)
+---------------------------------------------------
+local GamemodesToPause = {
+    ["Trial Easy"] = true,
+    ["Dragon Defense"] = true,
+    ["Tempest Invasion"] = true
+}
+
+local function InGamemode()
+    return GamemodesToPause[Omni.Data.Gamemode] == true
 end
+
+---------------------------------------------------
+-- 🔥 PAUSA / REACTIVA AUTOMÁTICO
+---------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(1)
+
+        if InGamemode() then
+          PauseMapFarm = true
+         else
+        PauseMapFarm = false
+       end
+    end
+end)
+
+---------------------------------------------------
+-- TP (LO MISMO TUYO)
+---------------------------------------------------
+local function TP(place, zone)
+    game.ReplicatedStorage.BridgeNet.dataRemoteEvent:FireServer(unpack({
+        {{"Player","Teleport","Teleport",place,zone,["n"]=5},"\2"}
+    }))
+end
+
+local Locations = {
+    ["Dragon Ball 1"] = function() TP("Dragon Verse",1) end,
+    ["Dragon Ball 2"] = function() TP("Dragon Verse",2) end,
+    ["Fruit Verse 1"] = function() TP("Fruits Verse",1) end,
+    ["Fruit Verse 2"] = function() TP("Fruits Verse",2) end,
+    ["Slime Verse 1"] = function() TP("Slime Verse",1) end,
+    ["Slime Verse 2"] = function() TP("Slime Verse",2) end,
+}
+
+Trial:CreateDropdown({
+    Name = "Lugar al salir",
+    Options = {"Dragon Ball 1","Dragon Ball 2","Fruit Verse 1","Fruit Verse 2","Slime Verse 1","Slime Verse 2"},
+    Callback = function(opt)
+        SelectedExit = opt[1]
+    end
+})
+
+---------------------------------------------------
+-- 🔥 AUTO SALIR POR WAVE (TRIAL)
+---------------------------------------------------
+
+local SelectedTrialWave = 10
+local AutoLeaveTrial = false
+
+Trial:CreateInput({
+    Name = "Salir en Wave (Trial)",
+    PlaceholderText = "Ej: 10",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then
+            SelectedTrialWave = num
+        end
+    end
+})
+
+Trial:CreateToggle({
+    Name = "Auto salir Trial",
+    Callback = function(v)
+        AutoLeaveTrial = v
+    end
+})
+
+---------------------------------------------------
+-- 🔁 LOOP AUTO SALIDA TRIAL
+---------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(1)
+
+        if not AutoLeaveTrial then continue end
+        if not SelectedExit then continue end
+
+        -- 🧠 Solo si estás en Trial
+        if Omni.Data.Gamemode ~= TrialName then continue end
+
+        local wave = nil
+
+        if TrialData and TrialData.Data then
+            wave = TrialData.Data.Wave
+        end
+
+        if wave then
+            print("🌊 Trial Wave:", wave)
+        end
+
+        if wave and wave >= SelectedTrialWave then
+            print("🚪 Saliendo de Trial en wave:", wave)
+
+            Locations[SelectedExit]()
+
+            task.wait(6) -- anti spam
+        end
+    end
+end)
+
+
+---------------------------------------------------
+-- RAID
+---------------------------------------------------
+local Raid = Window:CreateTab("Raid", 4483362460)
+
+
+
+---------------------------------------------------
+-- 🟣 DRAGON DEFENSE AUTOFARM
+---------------------------------------------------
+
+local Omni = require(game:GetService("ReplicatedStorage"):WaitForChild("Omni"))
+
+-- IMPORTANTE: nombre EXACTO del modo
+local GamemodeName = "Dragon Defense"
+
+local DataContainer = Omni.Libs.DataContainer:New({
+    Name = "GamemodeData - " .. GamemodeName
+})
+
+
+local AutoDragonDefense = false
+local DragonFolder = workspace.Server.Enemies.Gamemodes["Dragon Defense"]
+
+
+local AutoJoinDragon = false
+
+Raid:CreateToggle({
+    Name = "Auto Dragon Defense",
+    CurrentValue = false,
+    Callback = function(v)
+        AutoJoinDragon = v
+    end
+})
+
+
+local lastJoin = 0
+local JoinCooldown = 10 -- segundos anti spam
+local TrialName = "Trial Easy"
+local DragonName = "Dragon Defense"
+
+Raid:CreateToggle({
+    Name = "Auto Farm Dragon Defense",
+    CurrentValue = false,
+    Callback = function(v)
+        AutoDragonDefense = v
+    end
+})
+
+local function GetWave()
+    if DataContainer and DataContainer.Data then
+        return DataContainer.Data.Wave
+    end
+    return nil
+end
+
+local SelectedWave = 10
+local AutoLeaveWave = false
+
+Raid:CreateInput({
+    Name = "Salir en Wave",
+    PlaceholderText = "Ej: 10",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then
+            SelectedWave = num
+        end
+    end
+})
+
+Raid:CreateToggle({
+    Name = "Auto salir",
+    Callback = function(v)
+        AutoLeaveWave = v
+    end
+})
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+
+        if not AutoLeaveWave then continue end
+        if not SelectedExit then continue end
+
+        local wave = GetWave()
+
+        if wave then
+            print("Wave actual:", wave)
+        end
+
+        if wave and wave >= SelectedWave then
+            print("🔥 Saliendo en wave:", wave)
+
+            Locations[SelectedExit]()
+
+            task.wait(6) -- anti spam
+        end
+    end
+end)
+
+
+---------------------------------------------------
+-- 🔁 LOOP AUTO FARM Dragon Defense
+---------------------------------------------------
+task.spawn(function()
+    local target = nil
+
+    while true do
+        task.wait(1.5)
+
+        if not AutoDragonDefense then 
+            target = nil
+            continue 
+        end
+
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then continue end
+
+        -- 🔍 Buscar NPCs (BaseParts)
+        local npcs = {}
+        for _, v in pairs(DragonFolder:GetChildren()) do
+            if v:IsA("BasePart") then
+                table.insert(npcs, v)
+            end
+        end
+
+        -- ❌ Si no hay NPCs
+        if #npcs == 0 then
+            target = nil
+            continue
+        end
+
+        -- 🎯 Elegir target
+        if not target or not target.Parent then
+            target = npcs[math.random(1, #npcs)]
+        end
+
+        -- 📍 TP al NPC
+        if target and target.Parent then
+            hrp.CFrame = target.CFrame + Vector3.new(0, 3, 0)
+        end
+    end
+end)
+
+
+
+
+---------------------------------------------------
+-- 🌪️ TEMPEST INVASION RAID (FULL SYSTEM)
+---------------------------------------------------
+
+local AutoTempestInvasion = false
+local AutoJoinTempest = false
+local AutoLeaveTempest = false
+
+local SelectedTempestWave = 10
+local SelectedExitTempest = nil
+
+local TempestFolder = workspace.Server.Enemies.Gamemodes["Tempest Invasion"]
+local TempestName = "Tempest Invasion"
+
+local TempestData = Omni.Libs.DataContainer:New({
+    Name = "GamemodeData - Tempest Invasion"
+})
+
+
+---------------------------------------------------
+-- 🧠 RAID PRIORITY SYSTEM (NUMÉRICO)
+---------------------------------------------------
+
+local RaidPriority = {
+    ["Trial Easy"] = 1,
+    ["Tempest Invasion"] = 2,
+    ["Dragon Defense"] = 3
+}
+
+local function GetPriority(mode)
+    return RaidPriority[mode] or 999
+end
+
+local function CanJoinRaid(targetMode)
+    local current = Omni.Data.Gamemode
+
+    -- si no estás en nada → puedes entrar
+    if not current or current == "None" then
+        return true
+    end
+
+    -- si ya estás en ese mismo → no
+    if current == targetMode then
+        return false
+    end
+
+    -- prioridad: solo entra si es MÁS IMPORTANTE
+    return GetPriority(targetMode) < GetPriority(current)
+end
+
+---------------------------------------------------
+-- 🔘 AUTO JOIN
+---------------------------------------------------
+Raid:CreateToggle({
+    Name = "Auto Join Tempest Invasion",
+    CurrentValue = false,
+    Callback = function(v)
+        AutoJoinTempest = v
+    end
+})
+
+---------------------------------------------------
+-- 🔘 AUTO FARM
+---------------------------------------------------
+Raid:CreateToggle({
+    Name = "Auto Farm Tempest Invasion",
+    CurrentValue = false,
+    Callback = function(v)
+        AutoTempestInvasion = v
+    end
+})
+
+---------------------------------------------------
+-- 🔘 AUTO LEAVE
+---------------------------------------------------
+Raid:CreateToggle({
+    Name = "Auto Leave Tempest",
+    Callback = function(v)
+        AutoLeaveTempest = v
+    end
+})
+
+---------------------------------------------------
+-- 🔢 INPUT WAVE
+---------------------------------------------------
+Raid:CreateInput({
+    Name = "Salir en Wave (Tempest)",
+    PlaceholderText = "Ej: 10",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then
+            SelectedTempestWave = num
+        end
+    end
+})
+
+---------------------------------------------------
+-- 📍 SELECT EXIT LOCATION
+---------------------------------------------------
+Raid:CreateDropdown({
+    Name = "Lugar al salir (Tempest)",
+    Options = {
+        "Dragon Ball 1",
+        "Dragon Ball 2",
+        "Fruit Verse 1",
+        "Fruit Verse 2",
+        "Slime Verse 1",
+        "Slime Verse 2"
+    },
+    Callback = function(opt)
+        SelectedExitTempest = opt[1]
+    end
+})
+
+---------------------------------------------------
+-- 🔁 AUTO JOIN LOOP
+---------------------------------------------------
+task.spawn(function()
+    local lastJoin = 0
+    local cooldown = 10
+
+    while true do
+        task.wait(2)
+
+        if not AutoJoinTempest then continue end
+
+        if not CanJoinRaid("Tempest Invasion") then
+            continue
+        end
+
+        if tick() - lastJoin >= cooldown then
+            lastJoin = tick()
+
+            game:GetService("ReplicatedStorage").BridgeNet.dataRemoteEvent:FireServer(unpack({
+                {
+                    {"General","Gamemodes","Join","Tempest Invasion",["n"]=4},
+                    "\2"
+                }
+            }))
+        end
+    end
+end)
+
+---------------------------------------------------
+-- 🔁 AUTO FARM LOOP (TP NPCS)
+---------------------------------------------------
+task.spawn(function()
+    local target = nil
+
+    while true do
+        task.wait(0.5)
+
+        if not AutoTempestInvasion then
+            target = nil
+            continue
+        end
+
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then continue end
+
+        local npcs = {}
+
+        for _, v in pairs(TempestFolder:GetChildren()) do
+            if v:IsA("BasePart") then
+                table.insert(npcs, v)
+            end
+        end
+
+        if #npcs == 0 then
+            target = nil
+            continue
+        end
+
+        if not target or not target.Parent then
+            target = npcs[math.random(1, #npcs)]
+        end
+
+        if target and target.Parent then
+            hrp.CFrame = target.CFrame + Vector3.new(0,3,0)
+        end
+    end
+end)
+
+---------------------------------------------------
+-- 🔁 AUTO LEAVE WAVE LOOP (TEMPEST FIXED)
+---------------------------------------------------
+
+local function GetTempestWave()
+    if TempestData and TempestData.Data and TempestData.Data.Wave then
+        return TempestData.Data.Wave
+    end
+
+    -- fallback por si falla
+    if Omni and Omni.Data and Omni.Data.Wave then
+        return Omni.Data.Wave
+    end
+
+    return nil
+end
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+
+        if not AutoLeaveTempest then continue end
+        if not SelectedExitTempest then continue end
+        if Omni.Data.Gamemode ~= TempestName then continue end
+
+        local wave = GetTempestWave()
+
+        if wave then
+            print("🌪️ Tempest Wave:", wave)
+        end
+
+        if wave and wave >= SelectedTempestWave then
+            print("🚪 Saliendo Tempest en wave:", wave)
+
+            Locations[SelectedExitTempest]()
+
+            task.wait(6)
+        end
+    end
+end)
+
+---------------------------------------------------
+-- Verificar Gamemodes
+---------------------------------------------------
+
+local CurrentState = "None"
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+
+        local gm = Omni.Data.Gamemode
+
+        if gm == TrialName then
+            CurrentState = "Trial"
+
+        elseif gm == DragonName then
+            CurrentState = "Dragon"
+
+        else
+            CurrentState = "None"
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(2)
+
+        if not AutoJoinDragon then continue end
+
+        if not CanJoinRaid("Dragon Defense") then
+            continue
+        end
+
+        if tick() - lastJoin >= JoinCooldown then
+            lastJoin = tick()
+
+            game:GetService("ReplicatedStorage").BridgeNet.dataRemoteEvent:FireServer(unpack({
+                {
+                    {"General","Gamemodes","Join","Dragon Defense",["n"]=4},
+                    "\2"
+                }
+            }))
+        end
+    end
+end)
+
+
+
+---------------------------------------------------
+-- Gachas
+---------------------------------------------------
+
+local Gachas = Window:CreateTab("Gachas", 4483362461)
+
+---------------------------------------------------
+-- 🟡 AUTO GACHA SYSTEM
+---------------------------------------------------
+local AutoFruit = false
+local AutoRace = false
+local AutoDragon = false
+local AutoHaki = false
+local AutoSword = false
+local AutoSlime = false
+local AutoPrimordial = false 
+
+-- 🔘 TOGGLES
+Gachas:CreateToggle({
+    Name = "Auto Roll Fruit",
+    Callback = function(v) AutoFruit = v end
+})
+
+Gachas:CreateToggle({
+    Name = "Auto Roll Race",
+    Callback = function(v) AutoRace = v end
+})
+
+Gachas:CreateToggle({
+    Name = "Auto Roll Dragon Power",
+    Callback = function(v) AutoDragon = v end
+})
+
+Gachas:CreateToggle({
+    Name = "Auto Roll Haki",
+    Callback = function(v) AutoHaki = v end
+})
+
+Gachas:CreateToggle({
+    Name = "Auto Swords",
+    Callback = function(v) AutoSword = v end
+})
+
+Gachas:CreateToggle({
+    Name = "Auto Slime Power",
+    Callback = function(v) AutoSlime = v end
+})
+
+Gachas:CreateToggle({
+    Name = "Auto Primordial",
+    Callback = function(v) AutoPrimordial = v end
+})
+
+---------------------------------------------------
+-- 🔁 LOOP GENERAL (OPTIMIZADO) GACHA
+---------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+
+        local remote = game:GetService("ReplicatedStorage").BridgeNet.dataRemoteEvent
+
+        ---------------------------------------------------
+        -- 🍎 FRUIT
+        ---------------------------------------------------
+        if AutoFruit then
+            remote:FireServer(unpack({
+                {
+                    {"General","Gacha","Roll","Fruit",{},["n"]=5},
+                    "\2"
+                }
+            }))
+        end
+
+        ---------------------------------------------------
+        -- 🍎 Primordial
+        ---------------------------------------------------
+
+        if AutoPrimordial then
+            remote:FireServer(unpack({
+                {
+                    {"General","Gacha","Roll","Primordial Demon",{},["n"]=5},
+                    "\2"
+                }
+            }))
+        end
+
+        ---------------------------------------------------
+        -- 🧬 RACE
+        ---------------------------------------------------
+        if AutoRace then
+            remote:FireServer(unpack({
+                {
+                    {"General","Gacha","Roll","Race",{},["n"]=5},
+                    "\2"
+                }
+            }))
+        end
+
+        ---------------------------------------------------
+        -- 🐉 DRAGON POWER
+        ---------------------------------------------------
+        if AutoDragon then
+            remote:FireServer(unpack({
+                {
+                    {"General","Gacha","Roll","Dragon Power",{},["n"]=5},
+                    "\2"
+                }
+            }))
+        end
+
+        ---------------------------------------------------
+        -- 🐉 Slime Power
+        ---------------------------------------------------
+
+        if AutoSlime then
+            remote:FireServer(unpack({
+                {
+                    {"General","Gacha","Roll","Slime Power",{},["n"]=5},
+                    "\2"
+                }
+            }))
+        end
+
+        ---------------------------------------------------
+        -- 🐉 Swords
+        ---------------------------------------------------
+        if AutoSword then
+            remote:FireServer(unpack({
+                {
+                    {"General","Banner","Roll","Swords Banner",{},["n"]=4},
+                    "\2"
+                }
+            }))
+        end
+
+        ---------------------------------------------------
+        -- 🔥 HAKI
+        ---------------------------------------------------
+        if AutoHaki then
+            remote:FireServer(unpack({
+                {
+                    {"General","Gacha","Roll","Haki",{["Inferno Haki"]=true},["n"]=5},
+                    "\2"
+                }
+            }))
+        end
+    end
+end)
+
+---------------------------------------------------
+-- AutoMerchant
+---------------------------------------------------
+local Merchant = Window:CreateTab("Merchant", 4483362465)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Remote = ReplicatedStorage:WaitForChild("BridgeNet").dataRemoteEvent
+
+local AutoBuyPotionLuck = false
+local AutoBuyPotionPower = false
+local AutoBuyPotionCrystals = false
+local AutoBuyPotionDamage = false
+
+local function BuyItem(itemName)
+    local args = {
+        [1] = {
+            [1] = {
+                [1] = "General",
+                [2] = "Merchant",
+                [3] = "Buy",
+                [4] = "Dragon Merchant",
+                [5] = itemName,
+                [6] = 1,
+                ["n"] = 6
+            },
+            [2] = "\2"
+        }
+    }
+
+    Remote:FireServer(unpack(args))
+end
+Merchant:CreateToggle({
+    Name = "Auto Power Potion",
+    CurrentValue = false,
+    Callback = function(Value)
+        AutoBuyPotionPower = Value
+    end
+})
+
+Merchant:CreateToggle({
+    Name = "Auto Damage Potion",
+    CurrentValue = false,
+    Callback = function(Value)
+        AutoBuyPotionDamage = Value
+    end
+})
+
+Merchant:CreateToggle({
+    Name = "Auto Luck Potion",
+    CurrentValue = false,
+    Callback = function(Value)
+        AutoBuyPotionLuck = Value
+    end
+})
+
+Merchant:CreateToggle({
+    Name = "Auto Crystals Potion",
+    CurrentValue = false,
+    Callback = function(Value)
+        AutoBuyPotionCrystals = Value
+    end
+})
+
+task.spawn(function()
+    while true do
+        task.wait(2)
+
+        if AutoBuyPotionPower then
+            BuyItem("Power Potion I")
+        end
+
+        if AutoBuyPotionDamage then
+            BuyItem("Damage Potion I")
+        end
+
+        if AutoBuyPotionLuck then
+            BuyItem("Luck Potion I")
+        end
+
+        if AutoBuyPotionCrystals then
+            BuyItem("Crystal Potion I")
+        end
+    end
+end)
+
+
+
+---------------------------------------------------
+-- Otros
+---------------------------------------------------
+
+local Others = Window:CreateTab("Others", 4483362469)
+
+---------------------------------------------------
+-- 🟡 AUTO CLICK ESQUINA (UI / BOTÓN OCULTO)
+---------------------------------------------------
+local VirtualUser = game:GetService("VirtualUser")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local AutoCornerClick = false
+
+Others:CreateToggle({
+    Name = "Anti AFK",
+    CurrentValue = false,
+    Callback = function(v)
+        AutoCornerClick = v
+    end
+})
+
+task.spawn(function()
+    while true do
+        task.wait(20)
+
+        if not AutoCornerClick then continue end
+
+        local camera = workspace.CurrentCamera
+        if not camera then continue end
+
+        local viewport = camera.ViewportSize
+
+        -- 📍 Posición esquina inferior derecha
+        local x = viewport.X - 5
+        local y = viewport.Y - 5
+
+        -- 👇 Simula click
+        VirtualInputManager:SendMouseButtonEvent(x, y, 0, true, game, 0)
+        VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 0)
+    end
+end)
+
+---------------------------------------------------
+-- 🟡 AUTO CHESTS 12H
+---------------------------------------------------
+local AutoChests = false
+local remote = game:GetService("ReplicatedStorage").BridgeNet.dataRemoteEvent
+
+Others:CreateToggle({
+    Name = "Auto Claim Chests",
+    CurrentValue = false,
+    Callback = function(v)
+        AutoChests = v
+
+        -- 🔥 Reclamar inmediatamente al activar
+        if v then
+            task.spawn(function()
+                task.wait(1)
+
+                remote:FireServer(unpack({
+                    {{"General","Chests","Claim","Group Chest",["n"]=4},"\2"}
+                }))
+
+                task.wait(0.3)
+
+                remote:FireServer(unpack({
+                    {{"General","Chests","Claim","Daily Chest",["n"]=4},"\2"}
+                }))
+
+                task.wait(0.3)
+
+                remote:FireServer(unpack({
+                    {{"General","Chests","Claim","VIP Chest",["n"]=4},"\2"}
+                }))
+            end)
+        end
+    end
+})
+
+---------------------------------------------------
+-- 🔁 LOOP CADA 12 HORAS
+---------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(43200) -- ⏱ 12 horas (12 * 60 * 60)
+
+        if not AutoChests then continue end
+
+        remote:FireServer(unpack({
+            {{"General","Chests","Claim","Group Chest",["n"]=4},"\2"}
+        }))
+
+        task.wait(0.5)
+
+        remote:FireServer(unpack({
+            {{"General","Chests","Claim","Daily Chest",["n"]=4},"\2"}
+        }))
+
+        task.wait(0.5)
+
+        remote:FireServer(unpack({
+            {{"General","Chests","Claim","VIP Chest",["n"]=4},"\2"}
+        }))
+    end
+end)
+
+---------------------------------------------------
+-- 🟡 AUTO EQUIP BEST POWER
+---------------------------------------------------
+local AutoEquipBest = false
+local remote = game:GetService("ReplicatedStorage").BridgeNet.dataRemoteEvent
+
+Others:CreateToggle({
+    Name = "Auto Best Power",
+    CurrentValue = false,
+    Callback = function(v)
+        AutoEquipBest = v
+    end
+})
+
+---------------------------------------------------
+-- 🔁 LOOP CADA 100 SEGUNDOS
+---------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(100)
+
+        if not AutoEquipBest then continue end
+
+        remote:FireServer(unpack({
+            {
+                {"General","Inventory","EquipBest","Power",["n"]=4},
+                "\2"
+            }
+        }))
+    end
+end)
+
+---------------------------------------------------
+-- 🔁 AutoSkill
+---------------------------------------------------
+
+local RS = game:GetService("ReplicatedStorage")
+local Omni = require(RS:WaitForChild("Omni"))
+
+local AutoSkill = false
+
+Others:CreateToggle({
+    Name = "Auto Skill Tree (Cheapest First)",
+    Callback = function(state)
+        AutoSkill = state
+    end
+})
+
+local function parsePrice(v)
+    if typeof(v) == "number" then
+        return v
+    end
+    if type(v) ~= "string" then
+        return 0
+    end
+    return tonumber(v:gsub("%D","")) or 0
+end
+
+task.spawn(function()
+    while task.wait(2) do
+        if not AutoSkill then continue end
+
+        local treeName = "Pirate Evolution"
+
+        local treeModule = require(
+            RS:WaitForChild("Omni")
+              :WaitForChild("Shared")
+              :WaitForChild("SkillTree")
+              :WaitForChild(treeName)
+        )
+
+        local upgrades = treeModule.Upgrades
+        local playerData = Omni.Data.SkillTree[treeName] or {}
+
+        local candidates = {}
+
+        for name, data in pairs(upgrades) do
+            if not playerData[name] then
+                table.insert(candidates, {
+                    Name = name,
+                    Price = parsePrice(data.Price.Amount)
+                })
+            end
+        end
+
+        table.sort(candidates, function(a,b)
+            return a.Price < b.Price
+        end)
+
+        local nextUpgrade = candidates[1]
+
+        if nextUpgrade then
+            RS.BridgeNet.dataRemoteEvent:FireServer({
+                {
+                    "General",
+                    "SkillTree",
+                    "Unlock",
+                    treeName,
+                    nextUpgrade.Name,
+                    n = 5
+                },
+                "\2"
+            })
+        end
+    end
+end)
+
+
+---------------------------------------------------
+-- 🔁 AutoUpgradesTrial
+---------------------------------------------------
+
+
+local RS = game:GetService("ReplicatedStorage")
+
+local AutoUpgrade = false
+
+Others:CreateToggle({
+    Name = "Auto Trial Upgrades",
+    Callback = function(state)
+        AutoUpgrade = state
+    end
+})
+
+local upgradesList = {
+    "Power",
+    "Damage",
+    "Crystals",
+    "Attack Speed",
+    "Attack Distance"
+}
+
+task.spawn(function()
+    while task.wait(3) do
+        if not AutoUpgrade then continue end
+
+        local treeName = "Trial Upgrades"
+
+        for _, upgradeName in ipairs({
+            "Power",
+            "Damage",
+            "Crystals",
+            "Attack Speed",
+            "Attack Distance"
+        }) do
+
+            RS.BridgeNet.dataRemoteEvent:FireServer({
+                {
+                    "General",
+                    "Upgrade",
+                    "Upgrade",
+                    treeName,
+                    upgradeName,
+                    n = 5
+                },
+                "\2"
+            })
+
+            task.wait(0.9)
+        end
+    end
+end)
+
+
+---------------------------------------------------
+-- 🔁 AutoUpgradesTempest
+---------------------------------------------------
+
+local RS = game:GetService("ReplicatedStorage")
+
+local AutoTempest = false
+
+Others:CreateToggle({
+    Name = "Auto Tempest Upgrades",
+    Callback = function(state)
+        AutoTempest = state
+    end
+})
+
+local treeName = "Tempest Upgrades"
+
+local upgradesList = {
+    "Power",
+    "Damage",
+    "Crystals",
+    "Attack Speed",
+    "Attack Distance"
+}
+
+task.spawn(function()
+    while task.wait(1) do
+        if not AutoTempest then continue end
+
+        local module = require(
+            RS:WaitForChild("Omni")
+              :WaitForChild("Shared")
+              :WaitForChild("Upgrade")
+              :WaitForChild(treeName)
+        )
+
+        local upgrades = module.Upgrades
+
+        for _, upgradeName in ipairs(upgradesList) do
+
+            local data = upgrades[upgradeName]
+
+            if data and data.Index then
+                RS.BridgeNet.dataRemoteEvent:FireServer({
+                    {
+                        "General",
+                        "Upgrade",
+                        "Upgrade",
+                        treeName,
+                        upgradeName,
+                        n = 5
+                    },
+                    "\2"
+                })
+
+                task.wait(0.25)
+            end
+        end
+    end
+end)
