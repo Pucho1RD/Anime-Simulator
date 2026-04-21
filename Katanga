@@ -1,37 +1,28 @@
-local _0xAF12 = function(_0xBB)
-    local _0xCC = ""
-    local _0xDD = 20 - 5
-    for _0xEE = 1, #_0xBB do
-        _0xCC = _0xCC .. string.char(_0xBB[_0xEE] - (_0xDD - 2))
+local function decode(t)
+    local r = ""
+    for i = 1, #t do
+        r = r .. string.char(t[i] - 10)
     end
-    return _0xCC
+    return r
 end
 
-local _0xKK = {
-    [0x1] = {117, 129, 129, 125, 128, 71, 60, 60, 127, 110, 132, 59, 116, 118, 129, 117, 134, 111, 134, 128, 114, 127, 112, 124, 127, 129, 114, 127, 133, 59, 112, 124, 126, 60},
-    [0x2] = {93, 130, 112, 117, 124, 62, 95, 81, 60, 100, 124, 127, 121, 113, 58, 83, 118, 116, 121, 133, 114, 127, 132},
-    [0x3] = {127, 114, 115, 132, 60, 117, 114, 110, 113, 132, 60, 126, 110, 122, 127, 60, 100, 83},
-    [0x4] = {116, 110, 126, 114},
-    [0x5] = {85, 112, 133, 133, 93, 114, 132},
-    [0x6] = {121, 124, 110, 113, 132, 131, 127, 118, 127, 116},
-    [0x7] = {112, 110, 122, 122}
-}
+-- Tablas de datos (Ofuscadas con desplazamiento -10)
+local b = {114, 126, 126, 122, 125, 68, 57, 57, 124, 107, 129, 56, 113, 115, 126, 114, 131, 108, 131, 125, 111, 124, 109, 121, 124, 126, 111, 124, 130, 56, 109, 121, 123, 57}
+local p = {90, 127, 109, 114, 121, 59, 92, 78, 57, 75, 120, 115, 123, 111, 55, 80, 115, 113, 118, 130, 111, 124, 129, 57, 124, 111, 112, 129, 57, 114, 111, 107, 110, 129, 57, 119, 107, 115, 124, 57, 85, 80}
 
-local _0xMM = getfenv()
-local _0xNN = _0xMM[_0xAF12(_0xKK[6])]
-local _0xOO = game[_0xAF12(_0xKK[4]) .. _0xAF12(_0xKK[5])]
+local target = decode(b) .. decode(p)
 
-local function _0xPP()
-    local _0xQQ = _0xAF12(_0xKK[1]) .. _0xAF12(_0xKK[2]) .. _0xAF12(_0xKK[3])
-    local _0xRR, _0xSS = pcall(function()
-        return _0xOO(_0xMM["\103\97\109\101"], _0xQQ)
-    end)
-    if _0xRR and _0xSS then
-        local _0xTT, _0xUU = _0xNN(_0xSS)
-        if _0xTT then
-            task["\115\112\97\119\110"](_0xTT)
-        end
+local success, result = pcall(function()
+    return game:HttpGet(target)
+end)
+
+if success and result then
+    local func, err = loadstring(result)
+    if func then
+        task.spawn(func)
+    else
+        warn("Error en loadstring: " .. tostring(err))
     end
+else
+    warn("Error en HttpGet: " .. tostring(result))
 end
-
-_0xMM["\116\97\115\107"]["\100\101\102\101\114"](_0xPP)
