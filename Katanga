@@ -27,6 +27,38 @@ local NPCGroups = {}
 -- 🔥 NUEVO
 local PauseMapFarm = false
 
+-- 🔥 CLIENT ENEMIES (vida real)
+local ClientEnemies = workspace:WaitForChild("Client"):WaitForChild("Enemies")
+
+-- 🔍 buscar humanoid real
+local function GetRealHumanoid(part)
+    if not part then return nil end
+
+    local name = part.Name
+
+    for _, model in pairs(ClientEnemies:GetChildren()) do
+        if model.Name == name then
+            local hum = model:FindFirstChildOfClass("Humanoid")
+            if hum then
+                return hum
+            end
+        end
+    end
+
+    return nil
+end
+
+-- ❤️ check de vida REAL
+local function IsAlive(part)
+    local hum = GetRealHumanoid(part)
+
+    if hum then
+        return hum.Health > 0
+    end
+
+    return true -- fallback
+end
+
 ---------------------------------------------------
 -- MAPAS
 ---------------------------------------------------
@@ -157,22 +189,6 @@ task.spawn(function()
     local npcIndex = 1
     local partIndex = 1
 
-    -- 🔍 función para validar NPC vivo
-    local function IsAlive(part)
-        if not part or not part.Parent then return false end
-
-        local model = part.Parent
-        local hum = model:FindFirstChildOfClass("Humanoid")
-
-        -- ✔ si tiene humanoid → validamos vida
-        if hum then
-            return hum.Health > 0
-        end
-
-        -- ⚠️ si no tiene humanoid → lo consideramos válido (NPC fake)
-        return true
-    end
-
     while true do
         task.wait(0.6)
 
@@ -203,7 +219,7 @@ task.spawn(function()
         end
 
         ---------------------------------------------------
-        -- TODOS (SMART)
+        -- TODOS
         ---------------------------------------------------
         if TPAll then
             local targets = {}
@@ -229,7 +245,6 @@ task.spawn(function()
                     end
                 end
 
-                -- 🔁 si no encontró vivo → pasa al siguiente NPC
                 if not found then
                     partIndex = 1
                     npcIndex += 1
